@@ -19,6 +19,22 @@ export default Ember.Component.extend({
     'autogrow'
   ],
 
+  init() {
+    this._super(...arguments);
+    this._setPreviousAttrs();
+  },
+
+  _setPreviousAttrs() {
+    let optionNames = this.get('optionNames');
+    let attrs = [
+      'placeholder',
+      'html'
+    ];
+
+    let previousAttrs = this.getProperties(attrs.concat(optionNames));
+    this.set('_previousAttrs', previousAttrs);
+  },
+
   _updateDisabled(){
     if (typeof this.get("disabled") === "boolean") {
       this.$().trumbowyg(this.get('disabled') ? 'disable' : 'enable');
@@ -50,20 +66,20 @@ export default Ember.Component.extend({
     this.$().trumbowyg('destroy');
   },
 
-  _isAttrChanged(attrs, attrName){
-    return Ember.get(attrs, `newAttrs.${attrName}.value`) !== Ember.get(attrs, `oldAttrs.${attrName}.value`);
+  _isAttrChanged(attrName){
+    return this.get(attrName) !== this.get(`_previousAttrs.${attrName}`);
   },
 
   didInsertElement(){
     this._renderTrumbowyg();
   },
 
-  didUpdateAttrs(attrs) {
+  didUpdateAttrs() {
     const optionsUpdated = this.get('optionNames')
-      .some(optionName => this._isAttrChanged(attrs, optionName));
-    const htmlUpdated = Ember.get(attrs, 'newAttrs.html.value') !== this.$().trumbowyg('html');
-    const disabledUpdated = this._isAttrChanged(attrs, 'disabled');
-    const placeholderUpdated = this._isAttrChanged(attrs, 'placeholder');
+      .some(optionName => this._isAttrChanged(optionName));
+    const htmlUpdated = this.get('html') !== this.$().trumbowyg('html');
+    const disabledUpdated = this._isAttrChanged('disabled');
+    const placeholderUpdated = this._isAttrChanged('placeholder');
 
     if (optionsUpdated || placeholderUpdated) {
       this._destroyTrumbowyg();
@@ -77,6 +93,8 @@ export default Ember.Component.extend({
     if (disabledUpdated) {
       this._updateDisabled();
     }
+
+    this._setPreviousAttrs();
   },
 
   willDestroyElement(){

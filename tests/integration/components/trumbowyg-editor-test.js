@@ -5,20 +5,54 @@ moduleForComponent('trumbowyg-editor', 'Integration | Component | trumbowyg edit
   integration: true
 });
 
-test('it renders', function(assert) {
-  // Set any properties with this.set('myProperty', 'value');
-  // Handle any actions with this.on('myAction', function(val) { ... });
-
-  this.render(hbs`{{trumbowyg-editor}}`);
-
-  assert.equal(this.$().text().trim(), '');
-
-  // Template block usage:
+test('html attr', function(assert) {
+  this.set('html', 'foo');
   this.render(hbs`
-    {{#trumbowyg-editor}}
-      template block text
-    {{/trumbowyg-editor}}
+    {{trumbowyg-editor html=html}}
   `);
 
-  assert.equal(this.$().text().trim(), 'template block text');
+  assert.equal(this.$('.trumbowyg-editor').text().trim(), 'foo');
+
+  this.set('html', 'bar');
+
+  assert.equal(this.$('.trumbowyg-editor').text().trim(), 'bar');
+});
+
+test('placeholder attr', function(assert) {
+  this.set('placeholder', 'foo');
+  this.render(hbs`
+    {{trumbowyg-editor placeholder=placeholder}}
+  `);
+
+  assert.equal(this.$('.trumbowyg-editor').attr('placeholder'), 'foo');
+
+  this.set('placeholder', 'bar');
+
+  assert.equal(this.$('.trumbowyg-editor').attr('placeholder'), 'bar');
+});
+
+test('disabled attr', function(assert) {
+  this.set('disabled', true);
+  this.render(hbs`
+    {{trumbowyg-editor disabled=disabled}}
+  `);
+
+  assert.equal(this.$('.trumbowyg-editor').attr('contenteditable'), 'false');
+
+  this.set('disabled', false);
+
+  assert.equal(this.$('.trumbowyg-editor').attr('contenteditable'), 'true');
+});
+
+test('lang attr', function(assert) {
+  this.set('lang', 'hu');
+  this.render(hbs`
+    {{trumbowyg-editor lang=lang}}
+  `);
+
+  assert.ok(this.$('.trumbowyg').hasClass('trumbowyg-hu'));
+
+  this.set('lang', 'en');
+
+  assert.ok(this.$('.trumbowyg').hasClass('trumbowyg-en'));
 });
